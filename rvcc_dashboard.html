@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RVCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg-0: #0a0b0e;
+  --bg-1: #111318;
+  --bg-2: #181b22;
+  --bg-3: #1f232d;
+  --bg-4: #262b38;
+  --border: rgba(255,255,255,0.07);
+  --border-md: rgba(255,255,255,0.12);
+  --text-0: #f0f2f8;
+  --text-1: #9aa3b8;
+  --text-2: #5d6478;
+  --text-3: #3a3f52;
+  --accent: #4f7fff;
+  --accent-dim: rgba(79,127,255,0.12);
+  --green: #22c87a;
+  --green-dim: rgba(34,200,122,0.12);
+  --amber: #f5a623;
+  --amber-dim: rgba(245,166,35,0.12);
+  --red: #ff4f4f;
+  --red-dim: rgba(255,79,79,0.12);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,0.12);
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+  --transition: 200ms cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"] {
+  --bg-0: #f0f2f8;
+  --bg-1: #ffffff;
+  --bg-2: #f7f8fc;
+  --bg-3: #eef0f7;
+  --bg-4: #e4e7f0;
+  --border: rgba(0,0,0,0.07);
+  --border-md: rgba(0,0,0,0.12);
+  --text-0: #0d1117;
+  --text-1: #4a5068;
+  --text-2: #8890a8;
+  --text-3: #b8bdd0;
+  --accent: #2563eb;
+  --accent-dim: rgba(37,99,235,0.08);
+  --green: #16a34a;
+  --green-dim: rgba(22,163,74,0.08);
+  --amber: #d97706;
+  --amber-dim: rgba(217,119,6,0.08);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.08);
+  --purple: #7c3aed;
+  --purple-dim: rgba(124,58,237,0.08);
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: var(--font);
+  background: var(--bg-0);
+  color: var(--text-0);
+  min-height: 100vh;
+  line-height: 1.5;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ── LAYOUT ── */
+.shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  transition: background var(--transition);
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-mark {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #fff; letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+.logo-text { line-height: 1.2; }
+.logo-name { font-size: 13px; font-weight: 600; color: var(--text-0); }
+.logo-sub { font-size: 10px; color: var(--text-2); letter-spacing: 0.04em; text-transform: uppercase; }
+
+.sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-3); padding: 8px 10px 4px; margin-top: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all var(--transition);
+  color: var(--text-1); font-size: 13px; font-weight: 400;
+  margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--bg-3); color: var(--text-0); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+.nav-icon {
+  width: 18px; height: 18px; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; opacity: 0.7;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-footer {
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* THEME TOGGLE */
+.theme-toggle {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; width: 100%; border: none;
+  background: var(--bg-3); color: var(--text-1);
+  font-size: 12px; font-family: var(--font);
+  transition: all var(--transition);
+}
+.theme-toggle:hover { background: var(--bg-4); color: var(--text-0); }
+.toggle-track {
+  width: 32px; height: 18px; border-radius: 9px;
+  background: var(--bg-4); position: relative;
+  transition: background var(--transition); margin-left: auto;
+  border: 1px solid var(--border-md);
+}
+[data-theme="light"] .toggle-track { background: var(--accent); }
+.toggle-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text-2); position: absolute;
+  top: 2px; left: 2px; transition: all var(--transition);
+}
+[data-theme="light"] .toggle-thumb { left: 16px; background: #fff; }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* TOPBAR */
+.topbar {
+  height: 56px; flex-shrink: 0;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 24px;
+  transition: background var(--transition);
+}
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--text-0); }
+.topbar-sep { width: 1px; height: 20px; background: var(--border-md); margin: 0 4px; }
+.topbar-date { font-size: 12px; color: var(--text-2); font-family: var(--mono); }
+.topbar-filters { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+.filter-select {
+  height: 32px; padding: 0 10px;
+  background: var(--bg-2); border: 1px solid var(--border-md);
+  border-radius: var(--radius-sm); color: var(--text-0);
+  font-size: 12px; font-family: var(--font);
+  cursor: pointer; outline: none; transition: all var(--transition);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  padding-right: 26px;
+}
+.filter-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+.filter-label { font-size: 11px; color: var(--text-2); font-weight: 500; }
+
+/* CONTENT */
+.content {
+  flex: 1; overflow-y: auto; padding: 24px;
+  background: var(--bg-0);
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-4) transparent;
+}
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 3px; }
+
+/* PAGE */
+.page { display: none; animation: fadeIn 250ms ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* KPI GRID */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  transition: all var(--transition); position: relative; overflow: hidden;
+}
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent); opacity: 0;
+  transition: opacity var(--transition);
+}
+.kpi-card:hover::before { opacity: 1; }
+.kpi-card.green::before { background: var(--green); opacity: 1; }
+.kpi-card.red::before { background: var(--red); opacity: 1; }
+.kpi-card.amber::before { background: var(--amber); opacity: 1; }
+.kpi-card.purple::before { background: var(--purple); opacity: 1; }
+.kpi-label { font-size: 11px; color: var(--text-2); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 10px; }
+.kpi-value { font-size: 26px; font-weight: 300; color: var(--text-0); letter-spacing: -0.5px; line-height: 1; }
+.kpi-value span { font-size: 13px; color: var(--text-2); font-weight: 400; margin-left: 2px; }
+.kpi-sub { font-size: 11px; color: var(--text-2); margin-top: 6px; }
+.kpi-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 500; padding: 2px 7px;
+  border-radius: 20px; margin-top: 8px;
+}
+.kpi-badge.green { background: var(--green-dim); color: var(--green); }
+.kpi-badge.red { background: var(--red-dim); color: var(--red); }
+.kpi-badge.amber { background: var(--amber-dim); color: var(--amber); }
+
+/* CHARTS */
+.charts-grid { display: grid; gap: 16px; margin-bottom: 16px; }
+.g-2 { grid-template-columns: 1fr 1fr; }
+.g-3 { grid-template-columns: 1fr 1fr 1fr; }
+.g-1 { grid-template-columns: 1fr; }
+.chart-card {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+  transition: all var(--transition);
+}
+.chart-card:hover { border-color: var(--border-md); }
+.chart-card.span-2 { grid-column: span 2; }
+.chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+.chart-title { font-size: 12px; font-weight: 600; color: var(--text-1); text-transform: uppercase; letter-spacing: 0.06em; }
+.chart-subtitle { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+.chart-wrap { position: relative; width: 100%; }
+
+/* INSIGHTS */
+.insights-panel {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+  margin-bottom: 16px;
+  border-left: 3px solid var(--amber);
+}
+.insights-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.insights-title { font-size: 12px; font-weight: 600; color: var(--text-1); text-transform: uppercase; letter-spacing: 0.06em; }
+.pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--amber);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+.insight-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; line-height: 1.5;
+}
+.insight-row:last-child { border-bottom: none; }
+.insight-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.insight-dot.g { background: var(--green); }
+.insight-dot.a { background: var(--amber); }
+.insight-dot.r { background: var(--red); }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th {
+  text-align: left; padding: 9px 12px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-2); border-bottom: 1px solid var(--border);
+  white-space: nowrap; background: var(--bg-1);
+  position: sticky; top: 0; z-index: 1;
+}
+tbody td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text-0); white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--bg-2); }
+.td-num { text-align: right; font-family: var(--mono); font-size: 11.5px; }
+.td-ref { font-family: var(--mono); font-size: 11px; color: var(--text-2); }
+
+/* BADGES / STATUS */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
+}
+.badge.green { background: var(--green-dim); color: var(--green); }
+.badge.amber { background: var(--amber-dim); color: var(--amber); }
+.badge.red { background: var(--red-dim); color: var(--red); }
+.badge.blue { background: var(--accent-dim); color: var(--accent); }
+.badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* LEGEND */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; }
+.leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-2); }
+.leg-sq { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* SECTION HEADER */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-size: 15px; font-weight: 600; color: var(--text-0); }
+.section-meta { font-size: 11px; color: var(--text-2); }
+
+/* PLACEHOLDER */
+.placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 24px; color: var(--text-2); text-align: center; gap: 10px;
+}
+.placeholder svg { opacity: 0.3; }
+.placeholder-title { font-size: 13px; font-weight: 500; color: var(--text-1); }
+.placeholder-sub { font-size: 12px; color: var(--text-2); max-width: 320px; line-height: 1.6; }
+
+/* DIVIDER LINE */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+@media (max-width: 900px) {
+  .sidebar { width: 60px; }
+  .logo-text, .nav-item span, .nav-section-label, .theme-label { display: none; }
+  .logo-mark { justify-content: center; }
+  .nav-item { justify-content: center; padding: 10px; }
+  .topbar-filters { display: none; }
+  .g-2, .g-3 { grid-template-columns: 1fr; }
+  .chart-card.span-2 { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">RV</div>
+        <div class="logo-text">
+          <div class="logo-name">RVCC</div>
+          <div class="logo-sub">Executive Dashboard</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Analytics</div>
+      <button class="nav-item active" onclick="showPage('overview', this)">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+        </span>
+        <span>Overview</span>
+      </button>
+      <button class="nav-item" onclick="showPage('projects', this)">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <span>Projects</span>
+      </button>
+      <button class="nav-item" onclick="showPage('finance', this)">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M4.5 5.5C4.5 4.12 6.07 3 8 3s3.5 1.12 3.5 2.5S9.93 8 8 8s-3.5 1.12-3.5 2.5S6.07 13 8 13s3.5-1.12 3.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <span>Finance</span>
+      </button>
+      <button class="nav-item" onclick="showPage('procurement', this)">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 2h2l1.5 7h7l1.5-5H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="13" r="1" fill="currentColor"/><circle cx="11" cy="13" r="1" fill="currentColor"/></svg>
+        </span>
+        <span>Procurement</span>
+      </button>
+      <button class="nav-item" onclick="showPage('hr', this)">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5S10.5 10.515 10.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M13 8.5c.9.5 1.5 1.43 1.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <span>HR & Resources</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.22 3.22l1.06 1.06M11.72 11.72l1.06 1.06M3.22 12.78l1.06-1.06M11.72 4.28l1.06-1.06" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="theme-label">Theme</span>
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar-title" id="page-title">Overview</span>
+      <div class="topbar-sep"></div>
+      <span class="topbar-date">April 2026 · Xpedeon ERP</span>
+      <div class="topbar-filters">
+        <span class="filter-label">Division</span>
+        <select class="filter-select" id="div-filter" onchange="applyFilters()">
+          <option value="All">All</option>
+          <option value="CD">CD — Civil</option>
+          <option value="MF">MF — Metal Factory</option>
+          <option value="MP">MP — MEP / Fit-out</option>
+          <option value="SD">SD — Service / Drilling</option>
+        </select>
+        <span class="filter-label">Client</span>
+        <select class="filter-select" id="client-filter" onchange="applyFilters()">
+          <option value="All">All clients</option>
+          <option value="Al Yamama">Al Yamama</option>
+          <option value="Modern Building">Modern Building Leaders</option>
+          <option value="MBC">MBC Media</option>
+          <option value="Aramco">Aramco</option>
+          <option value="Almabani">Almabani</option>
+          <option value="Al Fanar">Al Fanar</option>
+          <option value="Elegancia">Elegancia</option>
+        </select>
+        <span class="filter-label">Status</span>
+        <select class="filter-select" id="rag-filter" onchange="applyFilters()">
+          <option value="All">All RAG</option>
+          <option value="Green">Green</option>
+          <option value="Amber">Amber</option>
+          <option value="Red">Red</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="page active" id="pg-overview">
+
+        <div class="kpi-grid" id="kpi-grid"></div>
+
+        <div class="insights-panel" id="insights-panel"></div>
+
+        <div class="charts-grid g-2">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Portfolio by division</div>
+                <div class="chart-subtitle">Contract value breakdown</div>
+              </div>
+            </div>
+            <div class="legend" id="div-donut-legend" style="margin-bottom:14px"></div>
+            <div class="chart-wrap" style="height:200px"><canvas id="divChart" role="img" aria-label="Donut chart: portfolio by division"></canvas></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Top 10 projects by contract value</div>
+                <div class="chart-subtitle">Color = margin health</div>
+              </div>
+            </div>
+            <div class="legend" style="margin-bottom:14px">
+              <div class="leg"><span class="leg-sq" style="background:#22c87a"></span>Margin &gt;15%</div>
+              <div class="leg"><span class="leg-sq" style="background:#f5a623"></span>8 – 15%</div>
+              <div class="leg"><span class="leg-sq" style="background:#ff4f4f"></span>&lt;8%</div>
+            </div>
+            <div class="chart-wrap" id="top10-wrap" style="height:300px"><canvas id="top10Chart" role="img" aria-label="Top 10 projects by contract value"></canvas></div>
+          </div>
+        </div>
+
+        <div class="charts-grid g-1">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Revenue vs cost vs gross margin by division</div>
+                <div class="chart-subtitle">SAR thousands</div>
+              </div>
+              <div class="legend">
+                <div class="leg"><span class="leg-sq" style="background:#4f7fff"></span>Contract Value</div>
+                <div class="leg"><span class="leg-sq" style="background:#ff4f4f"></span>Cost Incurred</div>
+                <div class="leg"><span class="leg-sq" style="background:#22c87a"></span>Gross Margin</div>
+              </div>
+            </div>
+            <div class="chart-wrap" style="height:220px"><canvas id="waterfallChart" role="img" aria-label="Revenue vs cost vs margin by division"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROJECTS ═══ -->
+      <div class="page" id="pg-projects">
+
+        <div class="charts-grid g-2">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Completion vs margin</div>
+                <div class="chart-subtitle">Bubble size = contract value · Color = division</div>
+              </div>
+            </div>
+            <div class="legend" style="margin-bottom:12px">
+              <div class="leg"><span class="leg-sq" style="background:#4f7fff"></span>CD</div>
+              <div class="leg"><span class="leg-sq" style="background:#22c87a"></span>MF</div>
+              <div class="leg"><span class="leg-sq" style="background:#f5a623"></span>MP</div>
+              <div class="leg"><span class="leg-sq" style="background:#ff4f4f"></span>SD</div>
+            </div>
+            <div class="chart-wrap" style="height:260px"><canvas id="scatterChart" role="img" aria-label="Scatter chart: completion % vs margin %"></canvas></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Initial vs current contract value</div>
+                <div class="chart-subtitle">Variation order impact · SAR K</div>
+              </div>
+            </div>
+            <div class="legend" style="margin-bottom:12px">
+              <div class="leg"><span class="leg-sq" style="background:#5d6478"></span>Initial</div>
+              <div class="leg"><span class="leg-sq" style="background:#4f7fff"></span>Current</div>
+            </div>
+            <div class="chart-wrap" id="varChart-wrap" style="height:260px"><canvas id="varChart" role="img" aria-label="Initial vs current contract value"></canvas></div>
+          </div>
+        </div>
+
+        <div class="charts-grid g-1">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Cost incurred by project</div>
+                <div class="chart-subtitle">Actual cost JTD · SAR K · Top 15 by cost</div>
+              </div>
+            </div>
+            <div class="chart-wrap" id="costChart-wrap" style="height:320px"><canvas id="costChart" role="img" aria-label="Cost incurred by project"></canvas></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Project matrix</div>
+            <div id="proj-count" class="section-meta"></div>
+          </div>
+          <div class="table-wrap" id="proj-table"></div>
+        </div>
+      </div>
+
+      <!-- ═══ FINANCE ═══ -->
+      <div class="page" id="pg-finance">
+        <div class="kpi-grid">
+          <div class="kpi-card purple">
+            <div class="kpi-label">Total contract value</div>
+            <div class="kpi-value">125.0<span>M SAR</span></div>
+            <div class="kpi-sub">45 active projects</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Cost incurred (JTD)</div>
+            <div class="kpi-value">11.7<span>M SAR</span></div>
+            <div class="kpi-sub">Project cost centres</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">All cost centres JTD</div>
+            <div class="kpi-value">26.5<span>M SAR</span></div>
+            <div class="kpi-sub">Incl. overheads</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Top management</div>
+            <div class="kpi-value">773<span>K SAR</span></div>
+            <div class="kpi-sub">JTD cost</div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-label">Aramco SD cost</div>
+            <div class="kpi-value">2.3<span>M SAR</span></div>
+            <div class="kpi-sub">JTD — near completion</div>
+          </div>
+        </div>
+
+        <div class="charts-grid g-2">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Estimated P&L — current portfolio</div>
+                <div class="chart-subtitle">SAR K · Based on contract vs cost data</div>
+              </div>
+            </div>
+            <div class="chart-wrap" style="height:240px"><canvas id="pnlChart" role="img" aria-label="P&L chart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">JTD cost — key cost centres</div>
+                <div class="chart-subtitle">SAR K</div>
+              </div>
+            </div>
+            <div class="chart-wrap" id="jtdChart-wrap" style="height:240px"><canvas id="jtdChart" role="img" aria-label="JTD cost by cost centre"></canvas></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Receivables & payables</div></div>
+          <div class="placeholder">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="4" y="8" width="32" height="24" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M4 14h32M12 22h8M12 27h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="placeholder-title">Awaiting live ERP data</div>
+            <div class="placeholder-sub">FIN01 (Receivable & Overdue) and FIN02 (Payable Scheduled) sheets are templates. Once Xpedeon export is populated, aging buckets and cashflow timeline will render automatically.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROCUREMENT ═══ -->
+      <div class="page" id="pg-procurement">
+        <div class="kpi-grid">
+          <div class="kpi-card blue" style="--kpi-accent:#4f7fff">
+            <div class="kpi-label">Total asset POs</div>
+            <div class="kpi-value">267.9<span>K SAR</span></div>
+            <div class="kpi-sub">24 purchase orders</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">IT assets</div>
+            <div class="kpi-value">145.8<span>K SAR</span></div>
+            <div class="kpi-sub">Hardware & software</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Plant & equipment</div>
+            <div class="kpi-value">122.1<span>K SAR</span></div>
+            <div class="kpi-sub">Machinery & tools</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Office stationery</div>
+            <div class="kpi-value">20.1<span>K SAR</span></div>
+            <div class="kpi-sub">6 POs across centres</div>
+          </div>
+        </div>
+
+        <div class="charts-grid g-2">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Asset value by type</div>
+                <div class="chart-subtitle">IT vs Plant & Equipment</div>
+              </div>
+            </div>
+            <div class="legend" id="assetType-legend" style="margin-bottom:14px"></div>
+            <div class="chart-wrap" style="height:200px"><canvas id="assetTypeChart" role="img" aria-label="Asset value by type"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Asset POs by cost centre</div>
+                <div class="chart-subtitle">SAR</div>
+              </div>
+            </div>
+            <div class="chart-wrap" id="assetBar-wrap" style="height:200px"><canvas id="assetBarChart" role="img" aria-label="Asset POs by cost centre"></canvas></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Asset & tools PO register</div><div class="section-meta">24 POs · SAR 267,924.52 total</div></div>
+          <div class="table-wrap" id="asset-table"></div>
+        </div>
+      </div>
+
+      <!-- ═══ HR ═══ -->
+      <div class="page" id="pg-hr">
+        <div class="kpi-grid">
+          <div class="kpi-card purple">
+            <div class="kpi-label">Head office JTD</div>
+            <div class="kpi-value">2.44<span>M SAR</span></div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Al Kharj factory</div>
+            <div class="kpi-value">2.77<span>M SAR</span></div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-label">Top management</div>
+            <div class="kpi-value">773<span>K SAR</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Service div projects</div>
+            <div class="kpi-value">2.09<span>M SAR</span></div>
+          </div>
+        </div>
+
+        <div class="charts-grid g-2">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Overhead cost centres JTD</div>
+                <div class="chart-subtitle">SAR K</div>
+              </div>
+            </div>
+            <div class="chart-wrap" id="overheadChart-wrap" style="height:280px"><canvas id="overheadChart" role="img" aria-label="Overhead cost centres JTD"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Project cost JTD by division</div>
+                <div class="chart-subtitle">SAR K · Filtered view</div>
+              </div>
+            </div>
+            <div class="chart-wrap" style="height:280px"><canvas id="divCostChart" role="img" aria-label="Project cost by division"></canvas></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Payroll groups — HR01–HR04</div></div>
+          <div class="placeholder">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="16" cy="14" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M4 34c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="30" cy="13" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M34 26c2.209 1.228 3.667 3.552 3.667 6.222" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="placeholder-title">Awaiting HR module export</div>
+            <div class="placeholder-sub">HR01 (Payroll by group: Project / Saudi / Expat staff), HR02 (Levy & Iqama), HR03 (Facility Management), HR04 (Air Tickets) — populate via Xpedeon HR module. Manpower sheets 03–05 also awaiting data.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+const PROJECTS = [
+  {ref:'101CD201',client:'Al Yamama',div:'CD',initVal:3792912,curVal:5057848,cost:411674,completion:.233,margin:.162,name:'AL URUBA PARK — Kiosk Structural'},
+  {ref:'101CD202',client:'Al Yamama',div:'CD',initVal:10054266,curVal:10858315,cost:479333,completion:.047,margin:null,name:'AL URUBA PARK — Plumbing & Drainage'},
+  {ref:'101CD203',client:'Al Yamama',div:'CD',initVal:12705522,curVal:15505273,cost:492520,completion:.178,margin:null,name:'AL URUBA PARK — Fire Fighting'},
+  {ref:'101CD204',client:'Al Yamama',div:'CD',initVal:2733809,curVal:2733809,cost:0,completion:.303,margin:null,name:'AL URUBA PARK — CD204'},
+  {ref:'101CD205',client:'Al Yamama',div:'CD',initVal:15848429,curVal:15848429,cost:934709,completion:.105,margin:null,name:'AL URUBA PARK — Waterfeatures'},
+  {ref:'101CD206',client:'Modern Building',div:'CD',initVal:3514610,curVal:6559121,cost:768564,completion:.512,margin:null,name:'KAP Primary Culvert'},
+  {ref:'101CD207',client:'Modern Building',div:'CD',initVal:2123915,curVal:2730373,cost:469569,completion:.115,margin:null,name:'KAP Secondary Culvert'},
+  {ref:'101CD208',client:'Modern Building',div:'CD',initVal:93984,curVal:93984,cost:21182,completion:.700,margin:null,name:'KAP Demolition'},
+  {ref:'101CD209',client:'Modern Building',div:'CD',initVal:287970,curVal:643258,cost:51603,completion:.275,margin:null,name:'KAP Finishing Work'},
+  {ref:'101CD210',client:'Modern Building',div:'CD',initVal:6485018,curVal:6485018,cost:1603660,completion:.219,margin:null,name:'KAP Retail Building'},
+  {ref:'101CD211',client:'Modern Building',div:'CD',initVal:313028,curVal:313028,cost:16979,completion:0,margin:null,name:'KAP Technical Building'},
+  {ref:'101CD212',client:'MBC',div:'CD',initVal:6671521,curVal:6671521,cost:2584169,completion:.626,margin:null,name:'MBC Infrastructure Project'},
+  {ref:'101CD213',client:'MBC',div:'CD',initVal:6756864,curVal:6756864,cost:1041450,completion:.974,margin:null,name:'MBC TCR & MCR ⚠'},
+  {ref:'101CD215',client:'Al-Fahd',div:'CD',initVal:1866000,curVal:1866000,cost:2280,completion:0,margin:null,name:'Al Fahd Water Foundation'},
+  {ref:'101CD216',client:'Almabani',div:'CD',initVal:2191589,curVal:2191589,cost:34641,completion:.569,margin:null,name:'Sports Blvd Waterproofing'},
+  {ref:'101CD217',client:'Al Yamama',div:'CD',initVal:44000,curVal:44000,cost:0,completion:1,margin:null,name:'CD217'},
+  {ref:'101CD226',client:'Al Arabiya',div:'CD',initVal:61181,curVal:61181,cost:0,completion:1,margin:null,name:'CD226'},
+  {ref:'101CD227',client:'MBC',div:'CD',initVal:25815,curVal:25815,cost:1391,completion:0,margin:null,name:'MBC Water Line'},
+  {ref:'101CD228',client:'MBC',div:'CD',initVal:157860,curVal:157860,cost:41112,completion:1,margin:null,name:'MBC Logo'},
+  {ref:'101CD229',client:'MBC',div:'CD',initVal:53131,curVal:53131,cost:0,completion:.162,margin:null,name:'CD229'},
+  {ref:'101CD230',client:'MBC',div:'CD',initVal:23140,curVal:23140,cost:0,completion:0,margin:null,name:'CD230'},
+  {ref:'101CD231',client:'MBC',div:'CD',initVal:25000,curVal:25000,cost:0,completion:1,margin:null,name:'CD231'},
+  {ref:'101CD239',client:'Almabani',div:'CD',initVal:13750,curVal:13750,cost:0,completion:1,margin:null,name:'CD239'},
+  {ref:'101CD242',client:'Al-Fahd',div:'CD',initVal:5005,curVal:5005,cost:0,completion:1,margin:null,name:'CD242'},
+  {ref:'101MF211',client:'Modern Building',div:'MF',initVal:6556251,curVal:7277438,cost:8348,completion:.9995,margin:null,name:'Yamama Palace Fence & Gate'},
+  {ref:'101MF217',client:'Almabani',div:'MF',initVal:3979500,curVal:3979500,cost:30520,completion:.230,margin:.111,name:'Sports Blvd Linear Shade'},
+  {ref:'101MF223',client:'Al Fanar',div:'MF',initVal:2412152,curVal:2412152,cost:25852,completion:.082,margin:null,name:'HVDC Converter'},
+  {ref:'101MF224',client:'Al Fanar',div:'MF',initVal:123010,curVal:123010,cost:0,completion:1,margin:null,name:'MF224'},
+  {ref:'101MF232',client:'Greenshore',div:'MF',initVal:74700,curVal:76924,cost:7418,completion:.971,margin:null,name:'Qiddiya HDG Bracket'},
+  {ref:'101MF234',client:'Al Fanar',div:'MF',initVal:477950,curVal:477950,cost:0,completion:0,margin:.075,name:'MF234'},
+  {ref:'101MF235',client:'Al Fanar',div:'MF',initVal:510800,curVal:510800,cost:0,completion:0,margin:.078,name:'MF235'},
+  {ref:'101MF236',client:'Al Fanar',div:'MF',initVal:449000,curVal:449000,cost:0,completion:0,margin:.071,name:'MF236'},
+  {ref:'101MF237',client:'Al Fanar',div:'MF',initVal:416350,curVal:416350,cost:0,completion:0,margin:.076,name:'MF237'},
+  {ref:'101MF241',client:'Al Fanar',div:'MF',initVal:97186,curVal:97186,cost:0,completion:0,margin:.144,name:'MF241'},
+  {ref:'101MP218',client:'Shapoorji',div:'MP',initVal:3355259,curVal:3355259,cost:278875,completion:.183,margin:null,name:'Al Nahda Complex — Shapoorji'},
+  {ref:'101MP219',client:'Elegancia',div:'MP',initVal:114510,curVal:114510,cost:16837,completion:.698,margin:.130,name:'Hotel West DB Works'},
+  {ref:'101MP220',client:'Elegancia',div:'MP',initVal:188940,curVal:188940,cost:711,completion:.798,margin:.059,name:'Elegancia DB Works'},
+  {ref:'101MP221',client:'Al Futtaim',div:'MP',initVal:188313,curVal:188313,cost:4071,completion:.764,margin:.095,name:'DB Dressing — Al Futtaim'},
+  {ref:'101MP239',client:'First Gulf',div:'MP',initVal:138730,curVal:138730,cost:0,completion:.360,margin:null,name:'MP239'},
+  {ref:'101SD101',client:'Aramco',div:'SD',initVal:1500604,curVal:1500604,cost:983354,completion:0,margin:null,name:'Aramco — Sand Control'},
+  {ref:'101SD102',client:'Aramco',div:'SD',initVal:1431559,curVal:1431559,cost:26761,completion:1,margin:null,name:'Aramco — Northern Pipeline'},
+  {ref:'101SD103',client:'Aramco',div:'SD',initVal:13253371,curVal:13253371,cost:1299889,completion:.965,margin:null,name:'Aramco — Gas Well Completion'},
+  {ref:'101SD104',client:'Aramco',div:'SD',initVal:2779780,curVal:2779780,cost:95868,completion:.982,margin:null,name:'Aramco — Manifa Producing'},
+  {ref:'101SD105',client:'GCC Auth',div:'SD',initVal:1538692,curVal:1538692,cost:0,completion:1,margin:null,name:'GCC Interconnection Authority'},
+  {ref:'101SD107',client:'Al-Mahri',div:'SD',initVal:8000,curVal:8000,cost:0,completion:1,margin:null,name:'SD107 — Al-Mahri'},
+];
+
+const ASSETS = [
+  {cc:'IT & Communication',po:'101/101D003/APO/26/00002',supplier:'Securseed Infosec',type:'IT',val:118360.8},
+  {cc:'IT & Communication',po:'101/101D003/APO/26/00005',supplier:'Dura Al Maha Contracting',type:'IT',val:4040},
+  {cc:'IT & Communication',po:'101/101D003/APO/26/00003',supplier:'Jeel Al Nadwa Contracting',type:'IT',val:19797.5},
+  {cc:'IT & Communication',po:'101/101D003/APO/26/00006',supplier:'Dura Al Maha Contracting',type:'IT',val:200},
+  {cc:'IT & Communication',po:'101/101D003/APO/26/00007',supplier:'Dura Al Maha Contracting',type:'IT',val:780},
+  {cc:'IT & Communication',po:'101/101MF225/APO/26/00003',supplier:'Dura Al Maha Contracting',type:'IT',val:1178},
+  {cc:'Metal Factory',po:'101/101MF225/APO/25/00002',supplier:'Aslak Nour Trading',type:'Plant & Equipment',val:8600},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00005',supplier:'Aslak Nour Trading',type:'Plant & Equipment',val:10250},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00006',supplier:'Green Shore Intl',type:'Plant & Equipment',val:2500},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00007',supplier:'Green Shore Intl',type:'Plant & Equipment',val:760},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00008',supplier:'Green Shore Intl',type:'Plant & Equipment',val:1474},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00009',supplier:'Green Shore Intl',type:'Plant & Equipment',val:7500},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00004',supplier:'Hilty Saudi Arabia',type:'Plant & Equipment',val:655.45},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00010',supplier:'Absolute Solution Iron',type:'Plant & Equipment',val:3210.11},
+  {cc:'Metal Factory',po:'101/101MF225/APO/26/00011',supplier:'Modern Arab Trading',type:'Plant & Equipment',val:5752.5},
+  {cc:'Assets (D004)',po:'101/101D004/APO/26/00003',supplier:'Durar Masagh Trading',type:'Plant & Equipment',val:18683},
+  {cc:'Assets (D004)',po:'101/101D004/APO/26/00007',supplier:'Durar Masagh Trading',type:'Plant & Equipment',val:22134.16},
+  {cc:'Assets (D004)',po:'101/101D004/APO/26/00001',supplier:'Fakhruddin Kaderbhai',type:'Plant & Equipment',val:360},
+  {cc:'Assets (D004)',po:'101/101D004/APO/26/00006',supplier:'Modern Arab Trading',type:'Plant & Equipment',val:9240},
+  {cc:'Assets (D004)',po:'101/101D004/APO/26/00008',supplier:'Modern Arab Trading',type:'Plant & Equipment',val:5752.5},
+  {cc:'Assets (D004)',po:'101/101D004/APO/26/00009',supplier:'Smart Supplies Co.',type:'Plant & Equipment',val:7130},
+  {cc:'Central Warehouse',po:'101/101D015/APO/26/00002',supplier:'Green Shore Intl',type:'Plant & Equipment',val:16576.5},
+  {cc:'Head Office',po:'101/101D016/APO/26/00001',supplier:'Lulu Saudi Hypermarkets',type:'Plant & Equipment',val:260},
+  {cc:'Top Management',po:'101/101D007/APO/26/00001',supplier:'Sky Information',type:'Plant & Equipment',val:2730},
+];
+
+// ── HELPERS ──
+function rag(p){
+  const m = p.margin !== null ? p.margin : (p.curVal > 0 ? (p.curVal - p.cost) / p.curVal : 0);
+  return m > 0.15 ? 'Green' : m >= 0.08 ? 'Amber' : 'Red';
+}
+function margin(p){ return p.margin !== null ? p.margin : (p.curVal > 0 ? (p.curVal - p.cost) / p.curVal : 0); }
+function fmt(n){ return Math.round(n/1000).toLocaleString(); }
+function fmtM(n){ return (n/1e6).toFixed(2); }
+function pct(n){ return (n*100).toFixed(1)+'%'; }
+function ragColor(r){ return r==='Green'?'#22c87a':r==='Amber'?'#f5a623':'#ff4f4f'; }
+
+// ── STATE ──
+let charts = {};
+let filtered = [...PROJECTS];
+
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+function getChartDefaults(){
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  return {
+    gridColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)',
+    tickColor: isDark ? '#5d6478' : '#8890a8',
+    tooltipBg: isDark ? '#1f232d' : '#ffffff',
+    tooltipBorder: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+    tooltipColor: isDark ? '#f0f2f8' : '#0d1117',
+  };
+}
+
+function applyFilters(){
+  const div = document.getElementById('div-filter').value;
+  const client = document.getElementById('client-filter').value;
+  const ragV = document.getElementById('rag-filter').value;
+  filtered = PROJECTS.filter(p => {
+    if(div !== 'All' && p.div !== div) return false;
+    if(client !== 'All' && !p.client.toLowerCase().includes(client.toLowerCase().split(' ')[0])) return false;
+    if(ragV !== 'All' && rag(p) !== ragV) return false;
+    return true;
+  });
+  renderAll();
+}
+
+// ── PAGE NAVIGATION ──
+const PAGE_TITLES = {overview:'Overview',projects:'Projects',finance:'Finance',procurement:'Procurement',hr:'HR & Resources'};
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[id];
+  if(id === 'finance') renderPNL();
+  if(id === 'procurement') renderProcurement();
+  if(id === 'hr') renderHR();
+}
+
+// ── THEME ──
+function toggleTheme(){
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  setTimeout(renderAll, 50);
+}
+
+// ── RENDER ALL ──
+function renderAll(){
+  renderKPIs();
+  renderInsights();
+  renderDivChart();
+  renderTop10();
+  renderWaterfall();
+  renderScatter();
+  renderVariation();
+  renderCostChart();
+  renderProjTable();
+  renderOverhead();
+  renderDivCostChart();
+}
+
+// ── KPIs ──
+function renderKPIs(){
+  const totalCV = filtered.reduce((s,p)=>s+p.curVal,0);
+  const totalCost = filtered.reduce((s,p)=>s+p.cost,0);
+  const avgM = totalCV > 0 ? (totalCV - totalCost) / totalCV : 0;
+  const redCount = filtered.filter(p=>rag(p)==='Red').length;
+  const greenCount = filtered.filter(p=>rag(p)==='Green').length;
+  const g = document.getElementById('kpi-grid');
+  g.innerHTML = `
+    <div class="kpi-card ${avgM>0.15?'green':avgM>=0.08?'amber':'red'}">
+      <div class="kpi-label">Total contract value</div>
+      <div class="kpi-value">${fmtM(totalCV)}<span>M SAR</span></div>
+      <div class="kpi-sub">${filtered.length} filtered projects</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Cost incurred</div>
+      <div class="kpi-value">${fmtM(totalCost)}<span>M SAR</span></div>
+      <div class="kpi-sub">Actual JTD</div>
+    </div>
+    <div class="kpi-card ${avgM>0.15?'green':avgM>=0.08?'amber':'red'}">
+      <div class="kpi-label">Gross margin (est.)</div>
+      <div class="kpi-value">${pct(avgM)}</div>
+      <span class="kpi-badge ${avgM>0.15?'green':avgM>=0.08?'amber':'red'}"><span class="dot"></span>${avgM>0.15?'On track':avgM>=0.08?'Watch':'Critical'}</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Active projects</div>
+      <div class="kpi-value">${filtered.length}</div>
+      <div class="kpi-sub">${greenCount} green · ${filtered.filter(p=>rag(p)==='Amber').length} amber · ${redCount} red</div>
+    </div>
+    <div class="kpi-card ${redCount>0?'red':'green'}">
+      <div class="kpi-label">Red flag projects</div>
+      <div class="kpi-value">${redCount}</div>
+      <span class="kpi-badge ${redCount>0?'red':'green'}"><span class="dot"></span>${redCount>0?'Needs attention':'All clear'}</span>
+    </div>
+  `;
+}
+
+// ── INSIGHTS ──
+function renderInsights(){
+  const overruns = filtered.filter(p=>p.cost > p.curVal);
+  const near = filtered.filter(p=>p.completion>0.85&&rag(p)==='Red');
+  const cdVal = filtered.filter(p=>p.div==='CD').reduce((s,p)=>s+p.curVal,0);
+  const sdCost = filtered.filter(p=>p.div==='SD').reduce((s,p)=>s+p.cost,0);
+  let html = `<div class="insights-header"><div class="pulse"></div><div class="insights-title">Auto-generated insights</div></div>`;
+  html += `<div class="insight-row"><span class="insight-dot r"></span><span>101CD213 (MBC TCR & MCR) is at <strong>97.4% completion</strong> but cost incurred exceeds revenue run-rate. CFO immediate attention required — estimated cost overrun risk.</span></div>`;
+  if(overruns.length) html += `<div class="insight-row"><span class="insight-dot r"></span><span>${overruns.length} project(s) show cost exceeding contract value: <strong>${overruns.map(p=>p.ref).join(', ')}</strong>. Cost-to-complete review urgently needed.</span></div>`;
+  html += `<div class="insight-row"><span class="insight-dot a"></span><span>SD division (Aramco): SAR ${fmt(sdCost)}K cost incurred. Projects 101SD103 and 101SD104 are above 96% completion — close-out and invoicing should be confirmed.</span></div>`;
+  html += `<div class="insight-row"><span class="insight-dot g"></span><span>${filtered.filter(p=>rag(p)==='Green').length} of ${filtered.length} filtered projects show healthy margin (&gt;15%). CD division dominates portfolio at SAR ${fmtM(cdVal)}M contract value.</span></div>`;
+  if(near.length) html += `<div class="insight-row"><span class="insight-dot a"></span><span>${near.length} project(s) approaching completion with red-flag margins — schedule cost-to-complete review: ${near.map(p=>p.ref).join(', ')}.</span></div>`;
+  document.getElementById('insights-panel').innerHTML = html;
+}
+
+// ── DIV DONUT ──
+function renderDivChart(){
+  destroyChart('divChart');
+  const cd = getChartDefaults();
+  const divs = ['CD','MF','MP','SD'];
+  const colors = ['#4f7fff','#22c87a','#f5a623','#ff4f4f'];
+  const data = divs.map(d=>filtered.filter(p=>p.div===d).reduce((s,p)=>s+p.curVal,0));
+  document.getElementById('div-donut-legend').innerHTML = divs.map((d,i)=>`<div class="leg"><span class="leg-sq" style="background:${colors[i]}"></span>${d} — ${fmtM(data[i])}M</div>`).join('');
+  charts['divChart'] = new Chart(document.getElementById('divChart'), {
+    type:'doughnut',
+    data:{labels:divs,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${fmtM(ctx.raw)}M`}}}}
+  });
+}
+
+// ── TOP 10 ──
+function renderTop10(){
+  destroyChart('top10Chart');
+  const cd = getChartDefaults();
+  const sorted = [...filtered].sort((a,b)=>b.curVal-a.curVal).slice(0,10);
+  const colors = sorted.map(p=>ragColor(rag(p)));
+  const wrap = document.getElementById('top10-wrap');
+  wrap.style.height = Math.max(240, sorted.length*34+60)+'px';
+  charts['top10Chart'] = new Chart(document.getElementById('top10Chart'), {
+    type:'bar',
+    data:{labels:sorted.map(p=>p.ref),datasets:[{data:sorted.map(p=>Math.round(p.curVal/1000)),backgroundColor:colors.map(c=>c+'cc'),borderColor:colors,borderWidth:1,borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v.toLocaleString()+'K'},border:{display:false}},y:{grid:{display:false},ticks:{color:cd.tickColor,autoSkip:false,font:{size:11}},border:{display:false}}}}
+  });
+}
+
+// ── WATERFALL ──
+function renderWaterfall(){
+  destroyChart('waterfallChart');
+  const cd = getChartDefaults();
+  const divs=['CD','MF','MP','SD'];
+  const rev=divs.map(d=>Math.round(filtered.filter(p=>p.div===d).reduce((s,p)=>s+p.curVal,0)/1000));
+  const cost=divs.map(d=>Math.round(filtered.filter(p=>p.div===d).reduce((s,p)=>s+p.cost,0)/1000));
+  const gm=rev.map((r,i)=>r-cost[i]);
+  charts['waterfallChart'] = new Chart(document.getElementById('waterfallChart'), {
+    type:'bar',
+    data:{labels:divs,datasets:[
+      {label:'Contract Value',data:rev,backgroundColor:'#4f7fff99',borderColor:'#4f7fff',borderWidth:1,borderRadius:4},
+      {label:'Cost Incurred',data:cost,backgroundColor:'#ff4f4f99',borderColor:'#ff4f4f',borderWidth:1,borderRadius:4},
+      {label:'Gross Margin',data:gm,backgroundColor:'#22c87a99',borderColor:'#22c87a',borderWidth:1,borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`${ctx.dataset.label}: SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{display:false},ticks:{color:cd.tickColor},border:{display:false}},y:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v.toLocaleString()+'K'},border:{display:false}}}}
+  });
+}
+
+// ── SCATTER ──
+function renderScatter(){
+  destroyChart('scatterChart');
+  const cd = getChartDefaults();
+  const divColors={CD:'#4f7fff',MF:'#22c87a',MP:'#f5a623',SD:'#ff4f4f'};
+  const datasets = Object.entries(divColors).map(([div,color])=>({
+    label:div,
+    data:filtered.filter(p=>p.div===div).map(p=>({x:Math.round(p.completion*100),y:+(margin(p)*100).toFixed(1),r:Math.max(5,Math.min(22,Math.sqrt(p.curVal/40000)))})),
+    backgroundColor:color+'66',borderColor:color,borderWidth:1.5
+  }));
+  charts['scatterChart'] = new Chart(document.getElementById('scatterChart'), {
+    type:'bubble',data:{datasets},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:16},plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.x}% done · ${ctx.parsed.y}% margin`}}},scales:{x:{title:{display:true,text:'Completion %',color:cd.tickColor,font:{size:11}},grid:{color:cd.gridColor},ticks:{color:cd.tickColor},min:-5,max:115,border:{display:false}},y:{title:{display:true,text:'Margin %',color:cd.tickColor,font:{size:11}},grid:{color:cd.gridColor},ticks:{color:cd.tickColor},min:-30,max:80,border:{display:false}}}}
+  });
+}
+
+// ── VARIATION ──
+function renderVariation(){
+  destroyChart('varChart');
+  const cd = getChartDefaults();
+  const projs = filtered.filter(p=>Math.abs(p.curVal-p.initVal)>1000).slice(0,9);
+  if(!projs.length) return;
+  const wrap = document.getElementById('varChart-wrap');
+  wrap.style.height = Math.max(220,projs.length*38+80)+'px';
+  charts['varChart'] = new Chart(document.getElementById('varChart'), {
+    type:'bar',
+    data:{labels:projs.map(p=>p.ref),datasets:[
+      {label:'Initial',data:projs.map(p=>Math.round(p.initVal/1000)),backgroundColor:cd.gridColor,borderColor:'rgba(93,100,120,0.5)',borderWidth:1,borderRadius:3},
+      {label:'Current',data:projs.map(p=>Math.round(p.curVal/1000)),backgroundColor:'#4f7fff99',borderColor:'#4f7fff',borderWidth:1,borderRadius:3},
+    ]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`${ctx.dataset.label}: SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v+'K'},border:{display:false}},y:{grid:{display:false},ticks:{color:cd.tickColor,autoSkip:false,font:{size:10.5}},border:{display:false}}}}
+  });
+}
+
+// ── COST CHART ──
+function renderCostChart(){
+  destroyChart('costChart');
+  const cd = getChartDefaults();
+  const projs = filtered.filter(p=>p.cost>0).sort((a,b)=>b.cost-a.cost).slice(0,15);
+  const colors = projs.map(p=>ragColor(rag(p)));
+  const wrap = document.getElementById('costChart-wrap');
+  wrap.style.height = Math.max(260,projs.length*28+80)+'px';
+  charts['costChart'] = new Chart(document.getElementById('costChart'), {
+    type:'bar',
+    data:{labels:projs.map(p=>p.ref),datasets:[{data:projs.map(p=>Math.round(p.cost/1000)),backgroundColor:colors.map(c=>c+'99'),borderColor:colors,borderWidth:1,borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`Cost: SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v+'K'},border:{display:false}},y:{grid:{display:false},ticks:{color:cd.tickColor,autoSkip:false,font:{size:10.5}},border:{display:false}}}}
+  });
+}
+
+// ── PROJECT TABLE ──
+function renderProjTable(){
+  const el = document.getElementById('proj-table');
+  const countEl = document.getElementById('proj-count');
+  if(countEl) countEl.textContent = `${filtered.length} projects`;
+  const rows = filtered.map(p=>{
+    const r = rag(p); const m = margin(p);
+    return `<tr>
+      <td><span class="badge ${r.toLowerCase()}"><span class="dot"></span>${r}</span></td>
+      <td class="td-ref">${p.ref}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--text-1)">${p.client}</td>
+      <td><span class="badge blue">${p.div}</span></td>
+      <td class="td-num">${fmtM(p.curVal)}M</td>
+      <td class="td-num">${p.cost>0?fmt(p.cost)+'K':'—'}</td>
+      <td class="td-num" style="color:${ragColor(r)}">${pct(m)}</td>
+      <td class="td-num">${pct(p.completion)}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table><thead><tr><th>Status</th><th>Ref</th><th>Client</th><th>Division</th><th>Contract Value</th><th>Cost JTD</th><th>Margin %</th><th>Completion %</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ── P&L CHART ──
+function renderPNL(){
+  destroyChart('pnlChart');
+  const cd = getChartDefaults();
+  const totalCV = Math.round(PROJECTS.reduce((s,p)=>s+p.curVal,0)/1000);
+  const totalCost = Math.round(PROJECTS.reduce((s,p)=>s+p.cost,0)/1000);
+  const gm = totalCV - totalCost;
+  const oh = 773 + 2440 + 305 + 21 + 26 + 14 + 3 + 63;
+  const np = gm - oh;
+  charts['pnlChart'] = new Chart(document.getElementById('pnlChart'), {
+    type:'bar',
+    data:{labels:['Contract\nValue','Direct\nCost','Gross\nMargin','Overheads','Net Profit\n(Est.)'],datasets:[{data:[totalCV,totalCost,gm,oh,np],backgroundColor:['#4f7fff99','#ff4f4f99','#22c87a99','#f5a62399',np>0?'#22c87a99':'#ff4f4f99'],borderColor:['#4f7fff','#ff4f4f','#22c87a','#f5a623',np>0?'#22c87a':'#ff4f4f'],borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{display:false},ticks:{color:cd.tickColor,font:{size:10.5}},border:{display:false}},y:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v.toLocaleString()+'K'},border:{display:false}}}}
+  });
+
+  destroyChart('jtdChart');
+  const centers = [
+    {n:'Head Office',v:2440},{n:'Al Kharj Factory',v:2774},{n:'Service Div Projects',v:2094},
+    {n:'Top Management',v:773},{n:'Aramco SD101',v:983},{n:'RVCC Entity',v:5341},
+    {n:'Projects Dept',v:305},{n:'Assets D004',v:63},
+  ].sort((a,b)=>b.v-a.v);
+  const wrap = document.getElementById('jtdChart-wrap');
+  wrap.style.height = (centers.length*32+80)+'px';
+  charts['jtdChart'] = new Chart(document.getElementById('jtdChart'), {
+    type:'bar',
+    data:{labels:centers.map(c=>c.n),datasets:[{data:centers.map(c=>c.v),backgroundColor:'#a78bfa99',borderColor:'#a78bfa',borderWidth:1,borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v+'K'},border:{display:false}},y:{grid:{display:false},ticks:{color:cd.tickColor,autoSkip:false,font:{size:10.5}},border:{display:false}}}}
+  });
+}
+
+// ── PROCUREMENT ──
+function renderProcurement(){
+  destroyChart('assetTypeChart');
+  destroyChart('assetBarChart');
+  const cd = getChartDefaults();
+  const it = ASSETS.filter(a=>a.type==='IT').reduce((s,a)=>s+a.val,0);
+  const pe = ASSETS.filter(a=>a.type!=='IT').reduce((s,a)=>s+a.val,0);
+  document.getElementById('assetType-legend').innerHTML = `<div class="leg"><span class="leg-sq" style="background:#4f7fff"></span>IT — SAR ${Math.round(it/1000)}K</div><div class="leg"><span class="leg-sq" style="background:#22c87a"></span>Plant & Equipment — SAR ${Math.round(pe/1000)}K</div>`;
+  charts['assetTypeChart'] = new Chart(document.getElementById('assetTypeChart'), {
+    type:'doughnut',
+    data:{labels:['IT','Plant & Equipment'],datasets:[{data:[Math.round(it),Math.round(pe)],backgroundColor:['#4f7fff','#22c87a'],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}`}}}}
+  });
+  const ccMap = {};
+  ASSETS.forEach(a=>{ ccMap[a.cc]=(ccMap[a.cc]||0)+a.val; });
+  const sorted = Object.entries(ccMap).sort((a,b)=>b[1]-a[1]);
+  const wrap = document.getElementById('assetBar-wrap');
+  wrap.style.height = (sorted.length*34+60)+'px';
+  charts['assetBarChart'] = new Chart(document.getElementById('assetBarChart'), {
+    type:'bar',
+    data:{labels:sorted.map(([k])=>k),datasets:[{data:sorted.map(([,v])=>Math.round(v)),backgroundColor:'#4f7fff99',borderColor:'#4f7fff',borderWidth:1,borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}`}}},scales:{x:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v.toLocaleString()},border:{display:false}},y:{grid:{display:false},ticks:{color:cd.tickColor,autoSkip:false,font:{size:10.5}},border:{display:false}}}}
+  });
+  const assetRows = [...ASSETS].sort((a,b)=>b.val-a.val).map(a=>`<tr>
+    <td style="color:var(--text-1)">${a.cc}</td>
+    <td class="td-ref">${a.po}</td>
+    <td style="color:var(--text-1)">${a.supplier}</td>
+    <td><span class="badge ${a.type==='IT'?'blue':'green'}">${a.type}</span></td>
+    <td class="td-num">${a.val.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+  </tr>`).join('');
+  document.getElementById('asset-table').innerHTML = `<table><thead><tr><th>Cost Centre</th><th>PO Reference</th><th>Supplier</th><th>Type</th><th>PO Value (SAR)</th></tr></thead><tbody>${assetRows}</tbody></table>`;
+}
+
+// ── HR ──
+function renderHR(){
+  destroyChart('overheadChart');
+  destroyChart('divCostChart');
+  renderOverhead();
+  renderDivCostChart();
+}
+
+function renderOverhead(){
+  destroyChart('overheadChart');
+  const cd = getChartDefaults();
+  const items = [
+    {n:'Head Office',v:2440},{n:'Al Kharj Factory',v:2774},{n:'Service Div Projects',v:2094},
+    {n:'Top Management',v:773},{n:'Finance & Accounts',v:14},{n:'HR & Admin',v:26},
+    {n:'IT & Technology',v:3},{n:'Assets (D004)',v:63},{n:'Procurement',v:1},
+    {n:'Tendering / BD',v:21},{n:'Projects Dept',v:305},{n:'Cost Control',v:1},
+  ].sort((a,b)=>b.v-a.v);
+  const wrap = document.getElementById('overheadChart-wrap');
+  wrap.style.height = (items.length*28+80)+'px';
+  charts['overheadChart'] = new Chart(document.getElementById('overheadChart'), {
+    type:'bar',
+    data:{labels:items.map(i=>i.n),datasets:[{data:items.map(i=>i.v),backgroundColor:'#a78bfa99',borderColor:'#a78bfa',borderWidth:1,borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v+'K'},border:{display:false}},y:{grid:{display:false},ticks:{color:cd.tickColor,autoSkip:false,font:{size:10.5}},border:{display:false}}}}
+  });
+}
+
+function renderDivCostChart(){
+  destroyChart('divCostChart');
+  const cd = getChartDefaults();
+  const divs=['CD','MF','MP','SD'];
+  const colors=['#4f7fff','#22c87a','#f5a623','#ff4f4f'];
+  const data = divs.map(d=>Math.round(filtered.filter(p=>p.div===d).reduce((s,p)=>s+p.cost,0)/1000));
+  charts['divCostChart'] = new Chart(document.getElementById('divCostChart'), {
+    type:'bar',
+    data:{labels:divs,datasets:[{data,backgroundColor:colors.map(c=>c+'99'),borderColor:colors,borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:cd.tooltipBg,borderColor:cd.tooltipBorder,borderWidth:1,titleColor:cd.tooltipColor,bodyColor:cd.tooltipColor,callbacks:{label:ctx=>`SAR ${ctx.raw.toLocaleString()}K`}}},scales:{x:{grid:{display:false},ticks:{color:cd.tickColor},border:{display:false}},y:{grid:{color:cd.gridColor},ticks:{color:cd.tickColor,callback:v=>v+'K'},border:{display:false}}}}
+  });
+}
+
+// ── INIT ──
+renderAll();
+</script>
+</body>
+</html>
