@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RVCC</title>
+<title>RVCC — Executive Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -371,11 +371,11 @@ tbody tr:hover td { background: var(--bg-2); }
         </span>
         <span>Finance</span>
       </button>
-      <button class="nav-item" onclick="showPage('procurement', this)">
+      <button class="nav-item" onclick="showPage('asset', this)">
         <span class="nav-icon">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 2h2l1.5 7h7l1.5-5H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="13" r="1" fill="currentColor"/><circle cx="11" cy="13" r="1" fill="currentColor"/></svg>
         </span>
-        <span>Procurement</span>
+        <span>Assets</span>
       </button>
       <button class="nav-item" onclick="showPage('hr', this)">
         <span class="nav-icon">
@@ -406,7 +406,7 @@ tbody tr:hover td { background: var(--bg-2); }
           <option value="All">All</option>
           <option value="CD">CD — Civil</option>
           <option value="MF">MF — Metal Factory</option>
-          <option value="MP">MP — MEP / Fit-out</option>
+          <option value="MP">MP — MEP</option>
           <option value="SD">SD — Service / Drilling</option>
         </select>
         <span class="filter-label">Client</span>
@@ -603,7 +603,7 @@ tbody tr:hover td { background: var(--bg-2); }
       </div>
 
       <!-- ═══ PROCUREMENT ═══ -->
-      <div class="page" id="pg-procurement">
+      <div class="page" id="pg-asset">
         <div class="kpi-grid">
           <div class="kpi-card blue" style="--kpi-accent:#4f7fff">
             <div class="kpi-label">Total asset POs</div>
@@ -829,7 +829,7 @@ function applyFilters(){
 }
 
 // ── PAGE NAVIGATION ──
-const PAGE_TITLES = {overview:'Overview',projects:'Projects',finance:'Finance',procurement:'Procurement',hr:'HR & Resources'};
+const PAGE_TITLES = {overview:'Overview',projects:'Projects',finance:'Finance',asset:'Asset',hr:'HR & Resources'};
 function showPage(id, btn){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -837,7 +837,7 @@ function showPage(id, btn){
   btn.classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[id];
   if(id === 'finance') renderPNL();
-  if(id === 'procurement') renderProcurement();
+  if(id === 'asset') renderAsset();
   if(id === 'hr') renderHR();
 }
 
@@ -1064,8 +1064,8 @@ function renderPNL(){
   });
 }
 
-// ── PROCUREMENT ──
-function renderProcurement(){
+// ── ASSET ──
+function renderAsset(){
   destroyChart('assetTypeChart');
   destroyChart('assetBarChart');
   const cd = getChartDefaults();
@@ -1111,7 +1111,7 @@ function renderOverhead(){
   const items = [
     {n:'Head Office',v:2440},{n:'Al Kharj Factory',v:2774},{n:'Service Div Projects',v:2094},
     {n:'Top Management',v:773},{n:'Finance & Accounts',v:14},{n:'HR & Admin',v:26},
-    {n:'IT & Technology',v:3},{n:'Assets (D004)',v:63},{n:'Procurement',v:1},
+    {n:'IT & Technology',v:3},{n:'Assets (D004)',v:63},{n:'Asset',v:1},
     {n:'Tendering / BD',v:21},{n:'Projects Dept',v:305},{n:'Cost Control',v:1},
   ].sort((a,b)=>b.v-a.v);
   const wrap = document.getElementById('overheadChart-wrap');
